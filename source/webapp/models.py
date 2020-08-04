@@ -1,26 +1,28 @@
 from django.db import models
-from django.utils import timezone
+from django.core.validators import MinValueValidator
+
+DEFAULT_CATEGORY = 'other'
+CATEGORY_CHOICES = (
+    (DEFAULT_CATEGORY, 'Разное'),
+    ('food', 'Еда'),
+    ('tech', 'Бытовая техника'),
+    ('tools', 'Инструменты'),
+    ('toys', 'Игрушки'),
+)
 
 
-STATUS_CHOICES = [
-    ('new', 'Не модерировано'),
-    ('moderated', 'Модерировано'),
-    ('rejected', 'Отклонено')
-]
-
-
-class Article(models.Model):
-    title = models.CharField(max_length=200, null=False, blank=False, verbose_name='Заголовок')
-    text = models.TextField(max_length=3000, null=False, blank=False, verbose_name='Текст')
-    author = models.CharField(max_length=40, null=False, blank=False, default='Unknown', verbose_name='Автор')
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='new', verbose_name='Модерация')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Время изменения')
-    publish_at = models.DateTimeField(verbose_name="Время публикации", blank=True, default=timezone.now)
+class Shop(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Название')
+    description = models.TextField(max_length=2000, null=True, blank=True, verbose_name='Описание')
+    category = models.CharField(max_length=20, default=DEFAULT_CATEGORY, choices=CATEGORY_CHOICES,
+                                verbose_name='Категория')
+    amount = models.IntegerField(verbose_name='Остаток', validators=(MinValueValidator(0),))
+    price = models.DecimalField(verbose_name='Цена', max_digits=7, decimal_places=2,
+                                validators=(MinValueValidator(0),))
 
     def __str__(self):
-        return "{}. {}".format(self.pk, self.title)
+        return f'{self.name} - {self.amount}'
 
     class Meta:
-        verbose_name = 'Статья'
-        verbose_name_plural = 'Статьи'
+        verbose_name = 'Товар'
+        verbose_name_plural = 'Товары'

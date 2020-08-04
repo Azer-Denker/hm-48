@@ -1,15 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Hello{% endblock %}
+{% block title %}Shop{% endblock %}
 
 {% block content %}
-    <h1>Статьи:</h1>
-    {% for article in articles %}
-        <h3><a href="{% url "article_view" article.pk %}">{{ article.title }}</a></h3>
-        <p>Статус: ({{ article.status }} | {{ article.get_status_display }})</p>
-        <p>{{ article.author }} | {{ article.created_at|date:"d.m.Y H:i:s" }}</p>
-        <p>Published at: {{ article.publish_at|date:"d.m.Y H:i:s" }}</p>
-        <p><a href="{% url 'article_update' article.pk %}">Update</a></p>
-        <p><a href="{% url 'article_delete' article.pk %}">Delete</a></p>
+    <h1>Заголовоки:</h1>
+    {% for shop in shops %}
+        <h3>Название: <a href="{% url "shop_view" shop.pk %}">{{ shop.name }}</a></h3>
+        <p>Цена: {{ shop.price }}</p>
+        <p>Категория: {{ shop.get_category_display }}</p>
+        <p><a href="{% url 'shop_update' shop.pk %}">Update</a></p>
+        <p><a href="{% url 'shop_delete' shop.pk %}">Delete</a></p>
     {% endfor %}
 {% endblock %}

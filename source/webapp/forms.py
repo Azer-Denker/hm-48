@@ -1,23 +1,14 @@
 from django import forms
-from .models import STATUS_CHOICES
+from .models import CATEGORY_CHOICES
+from django.core.validators import MinValueValidator
 
-default_status = STATUS_CHOICES[0][0]
-
-
-BROWSER_DATETIME_FORMAT = '%Y-%m-%dT%H:%M'
+default_status = CATEGORY_CHOICES[0][0]
 
 
-class ArticleForm(forms.Form):
-    title = forms.CharField(max_length=200, required=True, label='Заголовок')
-    text = forms.CharField(max_length=3000, required=True, label="Текст",
-                           widget=forms.Textarea)
-    author = forms.CharField(max_length=40, required=True, label='Автор', initial='Unknown')
-    status = forms.ChoiceField(choices=STATUS_CHOICES, required=True, label='Статус',
+class ShopForm(forms.Form):
+    name = forms.CharField(max_length=100, required=True, label='Заголовок')
+    description = forms.CharField(max_length=2000, label='Описание')
+    category = forms.ChoiceField(choices=CATEGORY_CHOICES, required=True, label='Категория',
                                initial=default_status)
-    publish_at = forms.DateTimeField(required=False, label='Время публикации',
-                                     input_formats=['%Y-%m-%d', BROWSER_DATETIME_FORMAT,
-                                                    '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d %H:%M',
-                                                    '%Y-%m-%d %H:%M:%S'],
-                                     widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
-    # для полей типа DateField
-    # publish_at = forms.DateField(..., widget=forms.DateInput(attrs={'type': 'date'}))
+    amount = forms.IntegerField(validators=(MinValueValidator(0),), label='Остаток')
+    price = forms.DecimalField(max_digits=7, decimal_places=2, label='Цена',)

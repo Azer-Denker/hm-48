@@ -2,103 +2,93 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseNotAllowed
 from django.utils.timezone import make_naive
 
-from webapp.models import Article
-from .forms import ArticleForm, BROWSER_DATETIME_FORMAT
+from webapp.models import Shop
+from .forms import ShopForm
 
 
 def index_view(request):
-    is_admin = request.GET.get('is_admin', None)
-    if is_admin:
-        data = Article.objects.all()
-    else:
-        data = Article.objects.filter(status='moderated')
+    data = Shop.objects.all()
     return render(request, 'index.html', context={
         'articles': data
     })
 
 
-def article_view(request, pk):
-    # try:
-    #     article = Article.objects.get(pk=pk)
-    # except Article.DoesNotExist:
-    #     raise Http404
+def shop_view(request, pk):
+    shop = get_object_or_404(Shop, pk=pk)
 
-    article = get_object_or_404(Article, pk=pk)
-
-    context = {'article': article}
-    return render(request, 'article_view.html', context)
+    context = {'shop': shop}
+    return render(request, 'shop_view.html', context)
 
 
-def article_create_view(request):
+def shop_create_view(request):
     if request.method == "GET":
-        form = ArticleForm()
-        return render(request, 'article_create.html', context={
+        form = ShopForm()
+        return render(request, 'shop_create.html', context={
             'form': form
         })
     elif request.method == 'POST':
-        form = ArticleForm(data=request.POST)
+        form = ShopForm(data=request.POST)
         if form.is_valid():
-            # article = Article.objects.create(**form.cleaned_data)
-            article = Article.objects.create(
-                title=form.cleaned_data['title'],
-                text=form.cleaned_data['text'],
-                author=form.cleaned_data['author'],
-                status=form.cleaned_data['status'],
-                publish_at=form.cleaned_data['publish_at']
+            shop = Shop.objects.create(
+                name=form.cleaned_data['name'],
+                description=form.cleaned_data['description'],
+                category=form.cleaned_data['category'],
+                amount=form.cleaned_data['amount'],
+                price=form.cleaned_data['price']
             )
-            return redirect('article_view', pk=article.pk)
+            return redirect('shop_view', pk=shop.pk)
         else:
-            return render(request, 'article_create.html', context={
+            return render(request, 'shop_create.html', context={
                 'form': form
             })
     else:
         return HttpResponseNotAllowed(permitted_methods=['GET', 'POST'])
 
 
-def article_update_view(request, pk):
-    article = get_object_or_404(Article, pk=pk)
+def shop_update_view(request, pk):
+    shop = get_object_or_404(Shop, pk=pk)
     if request.method == "GET":
-        form = ArticleForm(initial={
-            'title': article.title,
-            'text': article.text,
-            'author': article.author,
-            'status': article.status,
+        form = ShopForm(initial={
+            'name': shop.name,
+            'description': shop.description,
+            'category': shop.category,
+            'amount': shop.amount,
             # форматирование перед выводом для DateTime.
-            'publish_at': make_naive(article.publish_at)\
+            'price': make_naive(shop.price)\
                 .strftime(BROWSER_DATETIME_FORMAT)
             # для дат выглядит просто как:
-            # 'publish_at': article.publish_at
+            # 'price': shop.price
         })
-        return render(request, 'article_update.html', context={
+        return render(request, 'shop_update.html', context={
             'form': form,
-            'article': article
+            'shop': shop
         })
     elif request.method == 'POST':
-        form = ArticleForm(data=request.POST)
+        form = ShopForm(data=request.POST)
         if form.is_valid():
-            # Article.objects.filter(pk=pk).update(**form.cleaned_data)
-            article.title = form.cleaned_data['title']
-            article.text = form.cleaned_data['text']
-            article.author = form.cleaned_data['author']
-            article.status = form.cleaned_data['status']
-            article.publish_at = form.cleaned_data['publish_at']
-            article.save()
-            return redirect('article_view', pk=article.pk)
+            # Shop.objects.filter(pk=pk).update(**form.cleaned_data)
+            shop.name = form.cleaned_data['name']
+            shop.description = form.cleaned_data['description']
+            shop.category = form.cleaned_data['category']
+            shop.amount = form.cleaned_data['amount']
+            shop.price = form.cleaned_data['price']
+            shop.save()
+            return redirect('shop_view', pk=shop.pk)
         else:
-            return render(request, 'article_update.html', context={
-                'article': article,
+            return render(request, 'shop_update.html', context={
+                'shop': shop,
                 'form': form
             })
     else:
         return HttpResponseNotAllowed(permitted_methods=['GET', 'POST'])
 
 
-def article_delete_view(request, pk):
-    article = get_object_or_404(Article, pk=pk)
+def shop_delete_view(request, pk):
+    shop = get_object_or_404(Shop, pk=pk)
     if request.method == 'GET':
-        return render(request, 'article_delete.html', context={'article': article})
+        return render(request, 'shop_delete.html', context={'shop': shop})
     elif request.method == 'POST':
-        article.delete()
+        shop.delete()
         return redirect('index')
     else:
         return HttpResponseNotAllowed(permitted_methods=['GET', 'POST'])

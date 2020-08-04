@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Update{% endblock %}
+
+{% block menu %}
+    <li><a href="{% url 'shop_view' shop.pk %}">Отмена</a></li>
+{% endblock %}
+
+{% block content %}
+    <h1>Изменить Чек</h1>
+
+    {% url "shop_update" pk=shop.pk as action_url %}
+    {% include 'partial/form.html' with action_url=action_url form_method='post' button_text='Изменить' %}
+{% endblock %}
